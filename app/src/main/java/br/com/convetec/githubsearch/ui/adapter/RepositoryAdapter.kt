@@ -24,14 +24,15 @@ class RepositoryAdapter(
     // Pega o conteúdo da view e troca pela informação de item de uma lista
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val repository = repositories[position]
-        holder.repoName.text = repository.name
-        holder.itemView.setOnClickListener {
-            onItemClick(repository)
-        }
-        holder.shareIcon.setOnClickListener {
-            onShareClick(repository)
+        repository.let {
+            holder.repoName.text = it.name
+            holder.itemView.setOnClickListener { onItemClick(repository) }
+            holder.shareIcon.setOnClickListener {
+                onShareClick(repository)
+            }
         }
     }
+
 
     // Pega a quantidade de repositórios da lista
     override fun getItemCount(): Int = repositories.size
@@ -41,4 +42,6 @@ class RepositoryAdapter(
         val shareIcon: ImageView = view.findViewById(R.id.iv_compart)
     }
 }
+
+
 

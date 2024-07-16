@@ -6,14 +6,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import br.com.convetec.githubsearch.R
 import br.com.convetec.githubsearch.data.GitHubService
 import br.com.convetec.githubsearch.domain.Repository
 import br.com.convetec.githubsearch.ui.adapter.RepositoryAdapter
-import br.com.convetec.githubsearch.R
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -22,22 +21,23 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var nomeUsuario: EditText
-    lateinit var btnConfirmar: Button
-    lateinit var listaRepositories: RecyclerView
-    lateinit var githubApi: GitHubService
+    private lateinit var nomeUsuario: EditText
+    private lateinit var btnConfirmar: Button
+    private lateinit var listaRepositories: RecyclerView
+    private lateinit var githubApi: GitHubService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setupView()
         showUserName()
+        setupView()
         setupRetrofit()
         setupListeners()
+        showUserName()
     }
 
     // Método responsável por realizar o setup da view e recuperar os Ids do layout
-    fun setupView() {
+    private fun setupView() {
         nomeUsuario = findViewById(R.id.et_nome_usuario)
         btnConfirmar = findViewById(R.id.btn_confirmar)
         listaRepositories = findViewById(R.id.rv_lista_repositories)
@@ -67,14 +67,14 @@ class MainActivity : AppCompatActivity() {
     private fun showUserName() {
         val sharedPref = getPreferences(Context.MODE_PRIVATE) ?: return
         val savedUsername = sharedPref.getString("github_username", null)
-        if (!savedUsername.isNullOrEmpty()) {
-            nomeUsuario.setText(savedUsername)
-            getAllReposByUserName(savedUsername)
+        savedUsername?.let {
+            nomeUsuario.setText(it)
+            getAllReposByUserName(it)
         }
     }
 
     // Método responsável por fazer a configuração base do Retrofit
-    fun setupRetrofit() {
+    private fun setupRetrofit() {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.github.com/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Método responsável por buscar todos os repositórios do usuário fornecido
-    fun getAllReposByUserName(username: String) {
+    private fun getAllReposByUserName(username: String) {
         githubApi.getAllRepositoriesByUser(username).enqueue(object : Callback<List<Repository>> {
             override fun onResponse(call: Call<List<Repository>>, response: Response<List<Repository>>) {
                 if (response.isSuccessful) {
@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Método responsável por realizar a configuração do adapter
-    fun setupAdapter(list: List<Repository>) {
+    private fun setupAdapter(list: List<Repository>) {
         val adapter = RepositoryAdapter(
             list,
             onItemClick = { openBrowser(it.htmlUrl) },
@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Método responsável por compartilhar o link do repositório selecionado
-    fun shareRepositoryLink(urlRepository: String) {
+    private fun shareRepositoryLink(urlRepository: String) {
         val sendIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, urlRepository)
@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Método responsável por abrir o browser com o link informado do repositório
-    fun openBrowser(urlRepository: String) {
+    private fun openBrowser(urlRepository: String) {
         startActivity(
             Intent(
                 Intent.ACTION_VIEW,
@@ -132,3 +132,4 @@ class MainActivity : AppCompatActivity() {
         )
     }
 }
+
